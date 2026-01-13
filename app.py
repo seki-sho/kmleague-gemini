@@ -21,7 +21,7 @@ if menu == "日程調整":
     st.header("📅 日程調整（丸三角バツ入力）")
     # メンバー情報をスプレッドシートから取得
     try:
-        df_members = conn.read(worksheet="members")
+        df_members = conn.read(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="members")
         members = df_members["名前"].dropna().tolist()
         if not members:
             raise ValueError("メンバーが空です")
@@ -53,14 +53,14 @@ if menu == "日程調整":
 
         if submit:
             # スプレッドシート保存（1人1行、日付ごとにステータス）
-            df_existing = conn.read(worksheet="schedule")
+            df_existing = conn.read(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="schedule")
             new_rows = []
             for member in input_data:
                 for date, status in member["status"].items():
                     new_rows.append({"日付": date, "名前": member["name"], "ステータス": status, "備考": memo})
             df_new = pd.DataFrame(new_rows)
             df_updated = pd.concat([df_existing, df_new], ignore_index=True)
-            conn.update(worksheet="schedule", data=df_updated)
+            conn.update(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="schedule", data=df_updated)
             st.success("予定を保存しました！")
 
             # 組み合わせ抽出
@@ -136,9 +136,9 @@ elif menu == "スコア登録":
             
             # スプレッドシート更新
             try:
-                df_existing = conn.read(worksheet="results")
+                df_existing = conn.read(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="results")
                 df_updated = pd.concat([df_existing, pd.DataFrame([new_row])], ignore_index=True)
-                conn.update(worksheet="results", data=df_updated)
+                conn.update(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="results", data=df_updated)
                 st.success("計算完了！スプレッドシートに保存しました。")
                 st.table(pd.DataFrame([final_results])) # 計算結果をプレビュー
             except Exception as e:
@@ -151,7 +151,7 @@ elif menu == "ランキング表示":
     st.header("📊 通算成績ランキング")
     
     try:
-        df_results = conn.read(worksheet="results")
+        df_results = conn.read(spreadsheet=st.secrets["gsheets"]["spreadsheet"], worksheet="results")
         st.dataframe(df_results)
         
         # 可視化 (Plotly)
