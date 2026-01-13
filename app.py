@@ -103,7 +103,7 @@ elif menu == "スコア登録":
             total_points = sum(p["point"] for p in player_data)
             if total_points != 100000:
                 st.error(f"合計点が {total_points} です。100,000点になるよう調整してください。")
-                return
+                st.stop()
 
             # 2. 順位の決定 (同点時の処理は簡略化)
             # 素点の高い順にソート
